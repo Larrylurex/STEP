@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">steps</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_statistics">Statistics</string>
+    <string name="btnAdd">+</string>
+    <string name="btnMore">More</string>
+    <string name="btnCancel">Cancel</string>
+    <string name="btnOk">OK</string>
+    <string name="Transport">Transport</string>
+    <string name="Price">Default Price</string>
+    <string name="IsDefault">is default</string>
+    <string name="createItemDialog">Add new transport</string>
+    <string name="deleteItemMessage"> will be deleted</string>
+    <string name="existItemMessage">already exists</string>
+    <string name="btnStatistics">Statistics</string>
+    <string name="btnLeft">Previous data portion-</string>
+    <string name="btnRight">Next data portion</string>
+    <string name="btnZoomIn">Zoom In</string>
+    <string name="btnZoomOut">Zoom out</string>
+    <string name="tvChooseTransport">Choose transport</string>
+
+</resources>

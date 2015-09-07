@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:focusableInTouchMode="true">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:id="@+id/tvTransport"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:textAllCaps="true"/>
+
+        <view class="ru.tomatapps.steps.CurrencyEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/etPrice"
+            android:ems="4"/>
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btnAdd"
+        android:id="@+id/btnAdd"
+        android:layout_gravity="center_horizontal"/>
+
+</LinearLayout>
