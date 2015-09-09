@@ -34,7 +34,7 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
     private ChartLoader loader;
     private LineChart chart;
     private Date[] dates = new Date[2];
-    ArrayList<String> transport;
+    private ArrayList<String> transport;
 
     public static ChartFragment newInstance(Date[] dates) {
         ChartFragment fragment = new ChartFragment();
@@ -46,18 +46,24 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_chart, container, false);
-
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         if (getArguments() != null) {
             dates[0] = (Date)getArguments().getSerializable("begin");
             dates[1] = (Date)getArguments().getSerializable("end");
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_chart, container, false);
+
         chart = (LineChart)v.findViewById(R.id.chart);
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-
+        xAxis.setAvoidFirstLastClipping(true);
         YAxis yAxisRight = chart.getAxisRight();
         yAxisRight.setEnabled(false);
         getActivity().getSupportLoaderManager().initLoader(5, null, this);
@@ -83,12 +89,22 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-
+        Date[] xRangeDates = new Date[2];
         final long MILISEC_IN_DAY = 24*60*60*1000;
         float fMax = 0;
 
         ArrayList<String> xVals = new ArrayList<>();
-        for(long i = dates[0].getTime(); i <= dates[1].getTime(); i+=MILISEC_IN_DAY){
+        if(dates == null){
+            cursor.moveToFirst();
+            xRangeDates[0] = new Date(cursor.getLong(cursor.getColumnIndex(StepsContract.COL_DATE)));
+            cursor.moveToLast();
+            xRangeDates[1] = new Date(cursor.getLong(cursor.getColumnIndex(StepsContract.COL_DATE)));
+        }
+        else {
+            xRangeDates = dates;
+        }
+
+        for (long i = xRangeDates[0].getTime(); i <= xRangeDates[1].getTime(); i += MILISEC_IN_DAY) {
             SimpleDateFormat sdf = new SimpleDateFormat("d MMM");
             xVals.add(sdf.format(new Date(i)));
         }
@@ -96,15 +112,15 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
         cursor.moveToPosition(-1);
 
         while(cursor.moveToNext()){
-            String t = cursor.getString(cursor.getColumnIndex(DBHelper.COL_TRANSPORT));
+            String t = cursor.getString(cursor.getColumnIndex(StepsContract.COL_TRANSPORT));
             if(!map.containsKey(t)){
                 int[] y = new int[xVals.size()];
                 map.put(t, y);
             }
             int[] y = map.get(t);
-            long curDate = cursor.getLong(cursor.getColumnIndex(DBHelper.COL_DATE));
-            int index = (int)((curDate - dates[0].getTime())/MILISEC_IN_DAY);
-            y[index] = cursor.getInt(cursor.getColumnIndex(DBHelper.COL_QUANTITY));
+            long curDate = cursor.getLong(cursor.getColumnIndex(StepsContract.COL_DATE));
+            int index = (int)((curDate - xRangeDates[0].getTime())/MILISEC_IN_DAY);
+            y[index] = cursor.getInt(cursor.getColumnIndex(StepsContract.COL_QUANTITY));
             fMax = (y[index] > fMax) ? y[index] : fMax;
             map.put(t, y);
         }
@@ -126,19 +142,20 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
         int max = (int)fMax;
         YAxis Left = chart.getAxisLeft();
         Left.setAxisMaxValue(max+1);
-        Left.setLabelCount(max+2, true);
-
+        Left.setLabelCount(max + 2, true);
+        XAxis xAxis = chart.getXAxis();
+        xAxis.resetLabelsToSkip();
+        xAxis.setLabelsToSkip(xVals.size() - 2);
         chart.setData(lineData);
         chart.invalidate();
-
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
-    public class RemoveZeroFormatter implements ValueFormatter {
 
+    public class RemoveZeroFormatter implements ValueFormatter {
         private DecimalFormat mFormat;
 
         @Override

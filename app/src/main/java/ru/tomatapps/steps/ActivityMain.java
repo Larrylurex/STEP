@@ -5,30 +5,25 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 public class ActivityMain extends AppCompatActivity{
-    private DBHelper helper;
     private LoaderSettings loaderSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("myTag", "Activity onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        helper = new DBHelper(this);
 
         if(isFirstRun()){
             setDefaultSettings();
         }
 
-
-        setTestStatisticsData(); // DELETE!!!!!!!!!!!!!!!!!
-
-
-        String[] from = {DBHelper.COL_TRANSPORT, DBHelper.COL_PRICE};
+        String[] from = {StepsContract.COL_TRANSPORT, StepsContract.COL_PRICE};
         int[] to = {R.id.tvTransport, R.id.etPrice};
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.mainlist_item, null, from, to, 0);
 
@@ -38,16 +33,22 @@ public class ActivityMain extends AppCompatActivity{
         list.setFooterDividersEnabled(false);
         list.setAdapter(adapter);
 
-        loaderSettings = new LoaderSettings(this, adapter, helper, true);
+        loaderSettings = (LoaderSettings) getLastCustomNonConfigurationInstance();
+        if(loaderSettings ==null )
+            loaderSettings = new LoaderSettings(this, adapter, true);
+        else
+            loaderSettings.setAdapter(adapter);
+
         getSupportLoaderManager().initLoader(0, null, loaderSettings);
+        Log.d("myTag", "Loader " + getSupportLoaderManager().getLoader(0).hashCode());
+
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        loaderSettings.setDefaultOnly(true);
-        getSupportLoaderManager().getLoader(0).forceLoad();
+    public Object onRetainCustomNonConfigurationInstance() {
+        return loaderSettings;
     }
+
 
     private boolean isFirstRun(){
         SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -55,7 +56,7 @@ public class ActivityMain extends AppCompatActivity{
         if(isFirstRun){
             SharedPreferences.Editor editor = sPref.edit();
             editor.putBoolean("isFirstRun", false);
-            editor.commit();
+            editor.apply();
         }
         return isFirstRun;
     }
@@ -63,18 +64,20 @@ public class ActivityMain extends AppCompatActivity{
     private  void clearPrefs(){
         SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sPref.edit();
-        editor.clear().commit();
+        editor.clear().apply();
     }
 
     private void setDefaultSettings(){
-        helper.addSettingsItem(new DBHelper.SettingsItem("Автобус", 28.00f, true));
-        helper.addSettingsItem(new DBHelper.SettingsItem("Метро", 31.00f, true));
-        helper.addSettingsItem(new DBHelper.SettingsItem("Трамвай", 28.00f, true));
-        helper.addSettingsItem(new DBHelper.SettingsItem("Такси", 150.00f, false));
+        ContentResolverHelper helper = new ContentResolverHelper(this);
+        helper.addSettingsItem(new ContentResolverHelper.SettingsItem("Автобус", 28.00f, true));
+        helper.addSettingsItem(new ContentResolverHelper.SettingsItem("Метро", 31.00f, true));
+        helper.addSettingsItem(new ContentResolverHelper.SettingsItem("Трамвай", 28.00f, true));
+        helper.addSettingsItem(new ContentResolverHelper.SettingsItem("Такси", 150.00f, false));
     }
 
     private void setTestStatisticsData(){
-        helper.truncateTable(DBHelper.T_STATISTICS);
+        ContentResolverHelper helper = new ContentResolverHelper(this);
+        helper.truncateTable(StepsContract.STATISTICS_CONTENT_URI);
         helper.insertTestStatisticsData();
     }
 
@@ -93,6 +96,7 @@ public class ActivityMain extends AppCompatActivity{
                 startActivity(intent);
                 break;
         }
-
     }
+
+
 }

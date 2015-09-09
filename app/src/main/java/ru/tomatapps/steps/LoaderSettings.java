@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.widget.ResourceCursorAdapter;
 
 /**
@@ -15,16 +16,17 @@ public class LoaderSettings implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private ResourceCursorAdapter adapter;
     private Context context;
-    private DBHelper helper;
     private boolean defaultOnly;
     private SettingsCursorLoader settingsCursorLoader;
 
-    public LoaderSettings(Context ctx, ResourceCursorAdapter adapter, DBHelper helper, boolean defaultOnly){
+    public LoaderSettings(Context ctx, ResourceCursorAdapter adapter, boolean defaultOnly){
         context = ctx;
-        this.adapter = adapter;
-        this.helper = helper;
+        setAdapter(adapter);
         this.defaultOnly = defaultOnly;
+    }
 
+    public void setAdapter(ResourceCursorAdapter adapter){
+        this.adapter = adapter;
     }
 
     public  void switchMoreLess(){
@@ -40,13 +42,14 @@ public class LoaderSettings implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        settingsCursorLoader = new SettingsCursorLoader(context, helper);
+        settingsCursorLoader = new SettingsCursorLoader(context);
         settingsCursorLoader.setDefaultOnly(defaultOnly);
         return settingsCursorLoader;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        Log.d("myTag", "onFinished Callback " + this.hashCode() + " Loader " + cursorLoader.hashCode());
         adapter.swapCursor(cursor);
     }
 
@@ -56,16 +59,16 @@ public class LoaderSettings implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     static class SettingsCursorLoader extends CursorLoader {
-        private DBHelper helper;
+        private ContentResolverHelper helper;
 
         public void setDefaultOnly(boolean defaultOnly) {
             this.defaultOnly = defaultOnly;
         }
 
         private boolean defaultOnly;
-        public SettingsCursorLoader(Context context, DBHelper helper) {
+        public SettingsCursorLoader(Context context) {
             super(context);
-            this.helper = helper;
+            helper = new ContentResolverHelper(context);
         }
 
         @Override

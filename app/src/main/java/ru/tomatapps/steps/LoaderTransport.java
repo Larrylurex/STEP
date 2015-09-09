@@ -32,10 +32,9 @@ public class LoaderTransport implements LoaderManager.LoaderCallbacks<Cursor> {
         transport.clear();
         data.moveToPosition(-1);
         while(data.moveToNext()){
-            String t = data.getString(data.getColumnIndex(DBHelper.COL_TRANSPORT));
+            String t = data.getString(data.getColumnIndex(StepsContract.COL_TRANSPORT));
             transport.put(t, true);
         }
-        data.close();
     }
 
     @Override
@@ -44,15 +43,15 @@ public class LoaderTransport implements LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     static class TransportCursorLoader extends CursorLoader{
-        private Context context;
+        private ContentResolverHelper helper;
+
         public TransportCursorLoader(Context context) {
             super(context);
-            this.context = context;
+            helper = new ContentResolverHelper(context);
         }
 
         @Override
         public Cursor loadInBackground() {
-            DBHelper helper = new DBHelper(context);
             return helper.getTransportList();
         }
 

@@ -29,19 +29,26 @@ public class ListStatistics extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setRetainInstance(true);
         if (getArguments() != null) {
             dates[0] = (Date)getArguments().getSerializable("begin");
             dates[1] = (Date)getArguments().getSerializable("end");
         }
-        String[] from = new String[]{DBHelper.COL_TRANSPORT, DBHelper.COL_QUANTITY, DBHelper.COL_EXPENSES};
+        String[] from = new String[]{StepsContract.COL_TRANSPORT, StepsContract.COL_QUANTITY, StepsContract.COL_EXPENSES};
         int[] to = new int[]{R.id.tvTransport, R.id.tvQuantity, R.id.tvExpenses};
         adapter = new SimpleCursorAdapter(getActivity(), R.layout.statisticslist_item, null, from, to, 0);
         setListAdapter(adapter);
 
         loader = new LoaderStatistics(getActivity(), adapter, null, dates );
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         getActivity().getSupportLoaderManager().initLoader(3, null, loader);
     }
+
 
     public void setTransport(ArrayList<String> transport){
         loader.setTransport(transport);

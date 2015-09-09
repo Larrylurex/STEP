@@ -30,7 +30,7 @@ public class DialogDeleteItem extends DialogFragment implements View.OnClickList
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         getDialog().setTitle("Delete");
         View view =inflater.inflate(R.layout.confirm_dialog, container, false);
         ((TextView)view.findViewById(R.id.tvMessage)).setText(Transport + " " + getActivity().getString(R.string.deleteItemMessage));

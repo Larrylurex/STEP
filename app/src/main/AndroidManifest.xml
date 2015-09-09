@@ -24,6 +24,9 @@
             android:name=".ActivityStatistics"
             android:label="@string/title_activity_statistics" >
         </activity>
+        <provider
+            android:authorities="ru.tomatapps.steps"
+            android:name=".StepsContentProvider"/>.
     </application>
 
 </manifest>

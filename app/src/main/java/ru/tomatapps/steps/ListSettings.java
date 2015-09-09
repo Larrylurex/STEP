@@ -20,28 +20,39 @@ public class ListSettings extends Fragment implements MyCursorAdapter.CheckItemL
         DialogDeleteItem.DeleteItemDialogListener,
         DialogEditItem.EditItemDialogListener,
         DialogItemExists.ItemExistDialogListener{
-    private DBHelper helper;
+    private ContentResolverHelper helper;
+    private MyCursorAdapter adapter;
+    private LoaderSettings loader;
     private ListView list;
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setRetainInstance(true);
+
+        String[] from = {StepsContract.COL_TRANSPORT, StepsContract.COL_PRICE, StepsContract.COL_DEFAULT};
+        int[] to = {R.id.tvTransport, R.id.tvPrice, R.id.cbIsDefault};
+
+        adapter = new MyCursorAdapter(getActivity(), R.layout.settingslist_item, null, from, to, 0);
+        adapter.setMyCursorEventListener(this);
+
+        loader = new LoaderSettings(getActivity(), adapter, false);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings_list, container, false);
 
-        helper = new DBHelper(getActivity());
-
-        String[] from = {DBHelper.COL_TRANSPORT, DBHelper.COL_PRICE, DBHelper.COL_DEFAULT};
-        int[] to = {R.id.tvTransport, R.id.tvPrice, R.id.cbIsDefault};
-
-        MyCursorAdapter adapter = new MyCursorAdapter(getActivity(), R.layout.settingslist_item, null, from, to, 0);
-        adapter.setMyCursorEventListener(this);
+        helper = new ContentResolverHelper(getActivity());
 
         list = (ListView)view.findViewById(R.id.settingsList);
         list.setAdapter(adapter);
+        getActivity().getSupportLoaderManager().initLoader(1, null, loader);
 
-        LoaderSettings loaderSettings = new LoaderSettings(getActivity(), adapter, helper, false);
-
-        getActivity().getSupportLoaderManager().initLoader(1, null, loaderSettings);
+        getActivity().getSupportLoaderManager().getLoader(1).forceLoad();
         registerForContextMenu(list);
         return view;
     }
@@ -52,7 +63,7 @@ public class ListSettings extends Fragment implements MyCursorAdapter.CheckItemL
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
         Cursor cursor = (Cursor)list.getItemAtPosition(info.position);
 
-        String transport = cursor.getString(cursor.getColumnIndex(DBHelper.COL_TRANSPORT));
+        String transport = cursor.getString(cursor.getColumnIndex(StepsContract.COL_TRANSPORT));
         menu.setHeaderTitle(transport);
         menu.add(0, 0, 0,"Edit");
         menu.add(0, 1, 1, "Delete");
@@ -62,9 +73,9 @@ public class ListSettings extends Fragment implements MyCursorAdapter.CheckItemL
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Cursor cursor = (Cursor)list.getItemAtPosition(info.position);
-        long id = cursor.getLong(cursor.getColumnIndex(DBHelper.COL_ID));
-        String transport = cursor.getString(cursor.getColumnIndex(DBHelper.COL_TRANSPORT));
-        float price = cursor.getFloat(cursor.getColumnIndex(DBHelper.COL_PRICE));
+        long id = cursor.getLong(cursor.getColumnIndex(StepsContract.COL_ID));
+        String transport = cursor.getString(cursor.getColumnIndex(StepsContract.COL_TRANSPORT));
+        float price = cursor.getFloat(cursor.getColumnIndex(StepsContract.COL_PRICE));
         switch(item.getItemId()){
             case 0:
                 showEditDialog(id, transport, price);
@@ -81,7 +92,7 @@ public class ListSettings extends Fragment implements MyCursorAdapter.CheckItemL
         helper.editSettingsItemIsDefault(isChecked, id);
     }
 
-    public void addNewItem(DBHelper.SettingsItem item) {
+    public void addNewItem(ContentResolverHelper.SettingsItem item) {
         if(!helper.addSettingsItem(item)){
             showItemExistDialog(item.getTransport());
         }

@@ -12,19 +12,20 @@ import java.util.ArrayList;
  */
 public class ChartLoader extends CursorLoader {
 
-    DBHelper helper;
+    ContentResolverHelper helper;
     private Date[] dates;
     ArrayList<String> transport = new ArrayList<>();
+
+
+    public ChartLoader(Context context, Date[] dates) {
+        super(context);
+        helper = new ContentResolverHelper(context);
+        setSelection(null, dates);
+    }
 
     public void setSelection(ArrayList<String> transport, Date[] dates){
         this.transport = transport;
         this.dates = dates;
-    }
-
-    public ChartLoader(Context context, Date[] dates) {
-        super(context);
-        helper = new DBHelper(context);
-        setSelection(null, dates);
     }
 
     @Override

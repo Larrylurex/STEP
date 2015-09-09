@@ -17,7 +17,6 @@ import java.util.ArrayList;
 public class LoaderStatistics implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Context ctx;
-    private DBHelper helper;
     private SimpleCursorAdapter adapter;
     private StatisticsListLoader loader;
     private ArrayList<String> transport = new ArrayList<>();
@@ -26,7 +25,6 @@ public class LoaderStatistics implements LoaderManager.LoaderCallbacks<Cursor> {
     public LoaderStatistics(Context ctx, SimpleCursorAdapter adapter, ArrayList<String> transport, Date[] dates) {
         this.ctx = ctx;
         this.adapter = adapter;
-        this.helper = new DBHelper(ctx);
 
         this.transport = transport;
         this.dates = dates;
@@ -46,7 +44,7 @@ public class LoaderStatistics implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        loader = new StatisticsListLoader(ctx, helper);
+        loader = new StatisticsListLoader(ctx);
         loader.setSelection(transport, dates);
         return loader;
     }
@@ -63,13 +61,13 @@ public class LoaderStatistics implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
     static class StatisticsListLoader extends CursorLoader{
-        DBHelper helper;
+        ContentResolverHelper helper;
         ArrayList<String> transport = new ArrayList<>();
         Date[] dates;
 
-        public StatisticsListLoader(Context context, DBHelper helper) {
+        public StatisticsListLoader(Context context) {
             super(context);
-            this.helper = helper;
+            this.helper = new ContentResolverHelper(context);
         }
 
         public void setSelection(ArrayList<String> transport, Date[] dates){

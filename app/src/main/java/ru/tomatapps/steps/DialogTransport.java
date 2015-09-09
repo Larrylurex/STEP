@@ -65,8 +65,7 @@ public class DialogTransport extends DialogFragment {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         if(bundle != null)
-
-                transport = (HashMap<String, Boolean>) bundle.getSerializable("map");
+            transport = (HashMap<String, Boolean>) bundle.getSerializable("map");
 
     }
 

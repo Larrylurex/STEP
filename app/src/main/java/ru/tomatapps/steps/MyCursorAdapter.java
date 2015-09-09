@@ -17,7 +17,6 @@ import android.widget.TextView;
  */
 public class MyCursorAdapter extends ResourceCursorAdapter{
 
-    private Context context;
     private int layoutId;
     private LayoutInflater mInflater;
     private String[] mFrom;
@@ -31,7 +30,6 @@ public class MyCursorAdapter extends ResourceCursorAdapter{
 
     public MyCursorAdapter(Context context, int layout, Cursor c,String[] from, int[] to, int flags) {
         super(context, layout, c, flags);
-        this.context = context;
         this.mFrom = from;
         this.mTo = to;
         layoutId = layout;

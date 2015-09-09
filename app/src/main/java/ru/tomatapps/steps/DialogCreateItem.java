@@ -24,10 +24,6 @@ public class DialogCreateItem extends DialogFragment implements View.OnClickList
 
     private CreateItemDialogListener createItemDialogListener;
 
-    public void setCreateItemDialogListener(CreateItemDialogListener createItemDialogListener) {
-        this.createItemDialogListener = createItemDialogListener;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -58,7 +54,7 @@ public class DialogCreateItem extends DialogFragment implements View.OnClickList
                     price = 0.0f;
                 }
 
-                DBHelper.SettingsItem item = new DBHelper.SettingsItem(etTransport.getText().toString(), price, cbIsDefault.isChecked());
+                ContentResolverHelper.SettingsItem item = new ContentResolverHelper.SettingsItem(etTransport.getText().toString(), price, cbIsDefault.isChecked());
                 createItemDialogListener.createItem(item);
             }
         }
@@ -73,7 +69,7 @@ public class DialogCreateItem extends DialogFragment implements View.OnClickList
 
 
     public interface CreateItemDialogListener{
-        void  createItem(DBHelper.SettingsItem item);
+        void  createItem(ContentResolverHelper.SettingsItem item);
     }
 
 }

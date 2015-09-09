@@ -16,29 +16,6 @@ import java.util.HashMap;
 
 public class ActivityStatistics extends AppCompatActivity implements DialogTransport.OnTransportListListener {
 
-
-    public enum Mode{
-        ALL, YEAR, HALF_YEAR, QUARTER_YEAR, SINGLE_MONTH;
-        private static Mode[] modeArray = values();
-        public Mode next(){
-            int newOrdinal = ordinal();
-            if(ordinal() < modeArray.length -1)
-                newOrdinal = ordinal()+1;
-            return modeArray[newOrdinal];
-        }
-        public Mode previous(){
-            int newOrdinal = ordinal();
-            if(ordinal() > 0)
-                newOrdinal = ordinal()-1;
-            return modeArray[newOrdinal];
-        }
-        public boolean isFirst(){
-            return ordinal() == 0;
-        }
-        public boolean isLast(){
-            return ordinal() == modeArray.length -1;
-        }
-    }
     private  final int TRANSPORT_LOADER = 0;
 
     private Mode mode;
@@ -47,7 +24,9 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
     private int monthOffset;
     private HashMap<String, Boolean> transport = new HashMap<>();
     private ListStatistics listFragment;
+    private final String LISTFRAGMENT_TAG = "ListFragment";
     private ChartFragment chartFragment;
+    private final String CHARTFRAGMENT_TAG = "ChartFragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,15 +36,36 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
         LoaderTransport loaderTransport = new LoaderTransport(this, transport);
         getSupportLoaderManager().initLoader(TRANSPORT_LOADER, null, loaderTransport);
 
-        getDatesRange();
-        setMode(Mode.SINGLE_MONTH);
+        if(savedInstanceState == null) {
+            getDatesRange();
+            setMode(Mode.SINGLE_MONTH);
 
-        listFragment = ListStatistics.newInstance(dates);
-        chartFragment = ChartFragment.newInstance(dates);
-        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-        trans.replace(R.id.lfStatistics, listFragment);
-        trans.replace(R.id.chartContainer, chartFragment);
-        trans.commit();
+            listFragment = ListStatistics.newInstance(dates);
+            chartFragment = ChartFragment.newInstance(dates);
+            FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+            trans.replace(R.id.lfStatistics, listFragment, LISTFRAGMENT_TAG);
+            trans.replace(R.id.chartContainer, chartFragment, CHARTFRAGMENT_TAG);
+            trans.commit();
+        }
+        else{
+            datesRange = (Date[])savedInstanceState.getSerializable("DatesRange");
+            Mode m = (Mode)savedInstanceState.getSerializable("Mode");
+            setMode(m);
+            dates = (Date[])savedInstanceState.getSerializable("Dates");
+            transport = (HashMap<String, Boolean>)savedInstanceState.getSerializable("tMap");
+            setShiftBtnEnabled();
+            listFragment = (ListStatistics)getSupportFragmentManager().findFragmentByTag(LISTFRAGMENT_TAG);
+            chartFragment = (ChartFragment)getSupportFragmentManager().findFragmentByTag(CHARTFRAGMENT_TAG);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("Mode", mode);
+        outState.putSerializable("Dates", dates);
+        outState.putSerializable("DatesRange", datesRange);
+        outState.putSerializable("tMap", transport);
     }
 
     public void onChooseTransport(View view){
@@ -101,7 +101,7 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
     }
 
     private void getDatesRange(){
-        DBHelper helper = new DBHelper(this);
+        ContentResolverHelper helper = new ContentResolverHelper(this);
         datesRange = helper.getDatesRange();
     }
 
@@ -119,9 +119,12 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
         c.setTime(dates[0]);
         c.add(Calendar.MONTH, coef * monthOffset);
         dates[0] = new Date(c.getTime().getTime());
+
         c.setTime(dates[1]);
         c.add(Calendar.MONTH, coef * monthOffset);
+        c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
         dates[1] = new Date(c.getTime().getTime());
+
         setShiftBtnEnabled();
         listFragment.setDates(dates);
         chartFragment.setDates(dates);
@@ -141,7 +144,7 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
     private void setOffset() {
         switch(mode){
             case SINGLE_MONTH:
-                monthOffset =1;
+                monthOffset = 1;
                 break;
             case QUARTER_YEAR:
                 monthOffset = 3;
@@ -176,8 +179,7 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
-        c.add(Calendar.MONTH, 1-monthOffset);
-
+        c.add(Calendar.MONTH, 1 - monthOffset);
         dates[0] = new Date(c.getTimeInMillis());
     }
 
@@ -187,5 +189,28 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
 
         btnLeft.setEnabled(dates != null && dates[0].getTime() > datesRange[0].getTime());
         btnRight.setEnabled(dates != null && dates[1].getTime() < datesRange[1].getTime());
+    }
+
+    public enum Mode{
+        ALL, YEAR, HALF_YEAR, QUARTER_YEAR, SINGLE_MONTH;
+        private static Mode[] modeArray = values();
+        public Mode next(){
+            int newOrdinal = ordinal();
+            if(ordinal() < modeArray.length -1)
+                newOrdinal = ordinal()+1;
+            return modeArray[newOrdinal];
+        }
+        public Mode previous(){
+            int newOrdinal = ordinal();
+            if(ordinal() > 0)
+                newOrdinal = ordinal()-1;
+            return modeArray[newOrdinal];
+        }
+        public boolean isFirst(){
+            return ordinal() == 0;
+        }
+        public boolean isLast(){
+            return ordinal() == modeArray.length -1;
+        }
     }
 }
