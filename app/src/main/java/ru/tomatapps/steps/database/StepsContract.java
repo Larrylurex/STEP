@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.database;
 
 import android.net.Uri;
 

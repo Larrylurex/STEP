@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.database;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -10,7 +10,6 @@ import java.sql.Date;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import static ru.tomatapps.steps.StepsContract.*;
 
 /**
  * Created by LarryLurex on 25.08.2015.
@@ -28,12 +27,12 @@ public class ContentResolverHelper {
         Cursor cursor;
         String selection = null;
         String[] selectionArgs = null;
-        String orderBY = COL_DEFAULT + " DESC, " + COL_ID + " ASC";
+        String orderBY = StepsContract.COL_DEFAULT + " DESC, " + StepsContract.COL_ID + " ASC";
         if(defaultOnly) {
-            selection = COL_DEFAULT + " = ?";
+            selection = StepsContract.COL_DEFAULT + " = ?";
             selectionArgs = new String[]{"1"};
         }
-        cursor = resolver.query(SETTINGS_CONTENT_URI, null, selection, selectionArgs, orderBY);
+        cursor = resolver.query(StepsContract.SETTINGS_CONTENT_URI, null, selection, selectionArgs, orderBY);
         return cursor;
     }
 
@@ -41,44 +40,44 @@ public class ContentResolverHelper {
         if(checkExist(item.transport))
             return false;
         ContentValues cv = new ContentValues();
-        cv.put(COL_TRANSPORT, item.getTransport());
-        cv.put(COL_PRICE, item.getPrice());
-        cv.put(COL_DEFAULT, item.isDefault());
-        resolver.insert(SETTINGS_CONTENT_URI, cv);
+        cv.put(StepsContract.COL_TRANSPORT, item.getTransport());
+        cv.put(StepsContract.COL_PRICE, item.getPrice());
+        cv.put(StepsContract.COL_DEFAULT, item.isDefault());
+        resolver.insert(StepsContract.SETTINGS_CONTENT_URI, cv);
 
         return true;
     }
 
     public void editSettingsItemIsDefault(boolean isDefault, Long id){
         ContentValues cv = new ContentValues();
-        cv.put(COL_DEFAULT, isDefault);
+        cv.put(StepsContract.COL_DEFAULT, isDefault);
         String selection = "_id = ?";
         String[] selectionArgs = new String[]{id.toString()};
-        resolver.update(SETTINGS_CONTENT_URI, cv, selection, selectionArgs);
+        resolver.update(StepsContract.SETTINGS_CONTENT_URI, cv, selection, selectionArgs);
 
     }
 
     public void editSettingsItemPrice(Long id, Float newPrice) {
 
         ContentValues cv = new ContentValues();
-        cv.put(COL_PRICE, newPrice.toString());
+        cv.put(StepsContract.COL_PRICE, newPrice.toString());
         String selection = "_id = ?";
         String[] selectionArgs = new String[]{id.toString()};
-        resolver.update(SETTINGS_CONTENT_URI, cv, selection, selectionArgs);
+        resolver.update(StepsContract.SETTINGS_CONTENT_URI, cv, selection, selectionArgs);
 
     }
 
     public void deleteSettingsItem(Long id) {
         String selection = "_id = ?";
         String[] selectionArgs = new String[]{id.toString()};
-        resolver.delete(SETTINGS_CONTENT_URI, selection, selectionArgs);
+        resolver.delete(StepsContract.SETTINGS_CONTENT_URI, selection, selectionArgs);
     }
 
     private boolean checkExist(String transport){
         Cursor cursor;
-        String selection = COL_TRANSPORT + " = ?";
+        String selection = StepsContract.COL_TRANSPORT + " = ?";
         String[] selectionArgs = new String[]{transport};
-        cursor = resolver.query(SETTINGS_LIMIT_CONTENT_URI, null, selection, selectionArgs, null);
+        cursor = resolver.query(StepsContract.SETTINGS_LIMIT_CONTENT_URI, null, selection, selectionArgs, null);
         int count = cursor.getCount();
         cursor.close();
         return count > 0;
@@ -88,10 +87,10 @@ public class ContentResolverHelper {
 
     public Cursor getStatisticsListData(List<String> transport, Date[] dates) {
         Cursor cursor;
-        String[] columns = new  String[]{"SUM(" +COL_ID + ") AS " + COL_ID,
-                COL_TRANSPORT,
-                "Count("+ COL_TRANSPORT+") AS " + COL_QUANTITY,
-                "SUM(" + COL_PRICE +") AS " + COL_EXPENSES};
+        String[] columns = new  String[]{"SUM(" + StepsContract.COL_ID + ") AS " + StepsContract.COL_ID,
+                StepsContract.COL_TRANSPORT,
+                "Count("+ StepsContract.COL_TRANSPORT+") AS " + StepsContract.COL_QUANTITY,
+                "SUM(" + StepsContract.COL_PRICE +") AS " + StepsContract.COL_EXPENSES};
         String selection = null;
         if(transport != null && !transport.isEmpty()){
             selection = createTransportSelection(transport);
@@ -102,11 +101,11 @@ public class ContentResolverHelper {
                 selection = "";
             else
                 selection += " AND ";
-            selection += COL_DATE + " between ? AND ? ";
+            selection += StepsContract.COL_DATE + " between ? AND ? ";
             selectionArgs = new String[]{""+ dates[0].getTime() ,"" + dates[1].getTime()};
         }
 
-        cursor = resolver.query(STATISTICS_LIST_CONTENT_URI, columns, selection, selectionArgs, null);
+        cursor = resolver.query(StepsContract.STATISTICS_LIST_CONTENT_URI, columns, selection, selectionArgs, null);
 
         return cursor;
     }
@@ -114,8 +113,8 @@ public class ContentResolverHelper {
     public Cursor getStatisticsChartData(List<String> transport, Date[] dates) {
 
         Cursor cursor;
-        String[] columns = new  String[]{COL_TRANSPORT, COL_DATE,
-                "Count("+ COL_TRANSPORT+") AS " + COL_QUANTITY};
+        String[] columns = new  String[]{StepsContract.COL_TRANSPORT, StepsContract.COL_DATE,
+                "Count("+ StepsContract.COL_TRANSPORT+") AS " + StepsContract.COL_QUANTITY};
         String selection = null;
         if(transport != null && !transport.isEmpty()){
             selection = createTransportSelection(transport);
@@ -126,11 +125,11 @@ public class ContentResolverHelper {
                 selection = "";
             else
                 selection += " AND ";
-            selection += COL_DATE + " between ? AND ? ";
+            selection += StepsContract.COL_DATE + " between ? AND ? ";
             selectionArgs = new String[]{""+ dates[0].getTime() ,"" + dates[1].getTime()};
         }
-        String order = COL_DATE + " ASC ";
-        cursor = resolver.query(STATISTICS_CHART_CONTENT_URI, columns, selection, selectionArgs, order);
+        String order = StepsContract.COL_DATE + " ASC ";
+        cursor = resolver.query(StepsContract.STATISTICS_CHART_CONTENT_URI, columns, selection, selectionArgs, order);
 
         return cursor;
     }
@@ -138,7 +137,7 @@ public class ContentResolverHelper {
     private String createTransportSelection(List<String> transport){
         StringBuilder selection = new StringBuilder();
 
-        selection.append(COL_TRANSPORT);
+        selection.append(StepsContract.COL_TRANSPORT);
         selection.append(" In( ");
         for (String t : transport) {
             selection.append("'");
@@ -153,8 +152,8 @@ public class ContentResolverHelper {
 
     public Cursor getTransportList(){
         Cursor cursor;
-        String[] columns = {COL_TRANSPORT};
-        cursor = resolver.query(STATISTICS_TRANSPORT_CONTENT_URI, columns, null, null, null);
+        String[] columns = {StepsContract.COL_TRANSPORT};
+        cursor = resolver.query(StepsContract.STATISTICS_TRANSPORT_CONTENT_URI, columns, null, null, null);
         return cursor;
     }
 
@@ -194,20 +193,20 @@ public class ContentResolverHelper {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.MONTH, month);
         c.set(Calendar.DAY_OF_MONTH, day);
-        cv.put(COL_TRANSPORT, transport);
-        cv.put(COL_DATE, c.getTimeInMillis());
-        cv.put(COL_PRICE, price);
+        cv.put(StepsContract.COL_TRANSPORT, transport);
+        cv.put(StepsContract.COL_DATE, c.getTimeInMillis());
+        cv.put(StepsContract.COL_PRICE, price);
         for(int i=0; i< number; i++)
-            resolver.insert(STATISTICS_CONTENT_URI, cv);
+            resolver.insert(StepsContract.STATISTICS_CONTENT_URI, cv);
     }
 
     public Date[] getDatesRange(){
         final String MIN = "min";
         final String MAX = "max";
         Date[] dates = new Date[2];
-        String[] columns = new String[]{"MIN("+ COL_DATE+") AS " + MIN, "MAX("+ COL_DATE+") AS " + MAX};
+        String[] columns = new String[]{"MIN("+ StepsContract.COL_DATE+") AS " + MIN, "MAX("+ StepsContract.COL_DATE+") AS " + MAX};
 
-        Cursor cursor = resolver.query(STATISTICS_CONTENT_URI, columns, null, null, null);
+        Cursor cursor = resolver.query(StepsContract.STATISTICS_CONTENT_URI, columns, null, null, null);
         cursor.moveToFirst();
         long minTime = cursor.getLong(cursor.getColumnIndex(MIN));
         long maxTime = cursor.getLong(cursor.getColumnIndex(MAX));
@@ -218,7 +217,7 @@ public class ContentResolverHelper {
         return dates;
     }
 
-    static class SettingsItem{
+    public static class SettingsItem{
         private String transport;
         private float price;
         private boolean isDefault;

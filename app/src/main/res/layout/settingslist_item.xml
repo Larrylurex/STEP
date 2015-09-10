@@ -9,7 +9,7 @@
         android:id="@+id/tvTransport"
         android:layout_weight="1"/>
 
-    <view class="ru.tomatapps.steps.CurrencyTextView"
+    <view class="ru.tomatapps.steps.currency_views.CurrencyTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="4"

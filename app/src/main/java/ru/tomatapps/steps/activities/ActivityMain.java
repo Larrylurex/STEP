@@ -1,21 +1,25 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import ru.tomatapps.steps.database.ContentResolverHelper;
+import ru.tomatapps.steps.loaders.LoaderSettings;
+import ru.tomatapps.steps.R;
+import ru.tomatapps.steps.database.StepsContract;
+
 public class ActivityMain extends AppCompatActivity{
     private LoaderSettings loaderSettings;
+    private boolean isBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("myTag", "Activity onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -33,6 +37,10 @@ public class ActivityMain extends AppCompatActivity{
         list.setFooterDividersEnabled(false);
         list.setAdapter(adapter);
 
+        if(savedInstanceState != null){
+            isBack = savedInstanceState.getBoolean("isBack");
+        }
+
         loaderSettings = (LoaderSettings) getLastCustomNonConfigurationInstance();
         if(loaderSettings ==null )
             loaderSettings = new LoaderSettings(this, adapter, true);
@@ -40,8 +48,22 @@ public class ActivityMain extends AppCompatActivity{
             loaderSettings.setAdapter(adapter);
 
         getSupportLoaderManager().initLoader(0, null, loaderSettings);
-        Log.d("myTag", "Loader " + getSupportLoaderManager().getLoader(0).hashCode());
+    }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isBack", isBack);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(isBack){
+            loaderSettings.setDefaultOnly(true);
+            getSupportLoaderManager().getLoader(0).forceLoad();
+            isBack = false;
+        }
     }
 
     @Override
@@ -88,10 +110,12 @@ public class ActivityMain extends AppCompatActivity{
                 getSupportLoaderManager().getLoader(0).forceLoad();
                 break;
             case R.id.btnSettings:
+                isBack = true;
                 Intent intent = new Intent(this, ActivitySettings.class);
                 startActivity(intent);
                 break;
             case R.id.btnStatistics:
+                isBack = true;
                 intent = new Intent(this, ActivityStatistics.class);
                 startActivity(intent);
                 break;

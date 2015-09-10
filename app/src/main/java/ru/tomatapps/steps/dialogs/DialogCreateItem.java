@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.dialogs;
 
 
 import android.app.Activity;
@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+
+import ru.tomatapps.steps.database.ContentResolverHelper;
+import ru.tomatapps.steps.R;
 
 
 /**

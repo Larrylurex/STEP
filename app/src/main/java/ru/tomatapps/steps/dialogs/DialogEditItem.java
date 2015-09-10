@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.dialogs;
 
 
 import android.app.DialogFragment;
@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import ru.tomatapps.steps.R;
 
 
 /**

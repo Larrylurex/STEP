@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -11,6 +11,8 @@ import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
+
+import ru.tomatapps.steps.R;
 
 /**
  * Created by LarryLurex on 26.08.2015.

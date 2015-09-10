@@ -1,12 +1,17 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.activities;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import ru.tomatapps.steps.database.ContentResolverHelper.SettingsItem;
+import ru.tomatapps.steps.dialogs.DialogCreateItem;
+import ru.tomatapps.steps.fragments.ListSettings;
+import ru.tomatapps.steps.R;
 
-public class ActivitySettings extends AppCompatActivity implements DialogCreateItem.CreateItemDialogListener{
+
+public class ActivitySettings extends AppCompatActivity implements DialogCreateItem.CreateItemDialogListener {
     ListSettings listFragment;
 
     @Override
@@ -31,7 +36,7 @@ public class ActivitySettings extends AppCompatActivity implements DialogCreateI
     }
 
     @Override
-    public void createItem(ContentResolverHelper.SettingsItem item) {
+    public void createItem(SettingsItem item) {
         listFragment.addNewItem(item);
     }
 }

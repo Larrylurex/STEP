@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.activities;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -11,7 +11,14 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
+
+import ru.tomatapps.steps.fragments.ChartFragment;
+import ru.tomatapps.steps.database.ContentResolverHelper;
+import ru.tomatapps.steps.dialogs.DialogTransport;
+import ru.tomatapps.steps.fragments.ListStatistics;
+import ru.tomatapps.steps.loaders.LoaderTransport;
+import ru.tomatapps.steps.R;
+import ru.tomatapps.steps.others.TransportItem;
 
 
 public class ActivityStatistics extends AppCompatActivity implements DialogTransport.OnTransportListListener {
@@ -22,7 +29,8 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
     private Date[] datesRange;
     private Date[] dates;
     private int monthOffset;
-    private HashMap<String, Boolean> transport = new HashMap<>();
+    private ArrayList<TransportItem> transport = new ArrayList<>();
+
     private ListStatistics listFragment;
     private final String LISTFRAGMENT_TAG = "ListFragment";
     private ChartFragment chartFragment;
@@ -34,14 +42,15 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
         setContentView(R.layout.activity_statistics);
 
         LoaderTransport loaderTransport = new LoaderTransport(this, transport);
+        loaderTransport.setListener(this);
         getSupportLoaderManager().initLoader(TRANSPORT_LOADER, null, loaderTransport);
 
         if(savedInstanceState == null) {
             getDatesRange();
             setMode(Mode.SINGLE_MONTH);
 
-            listFragment = ListStatistics.newInstance(dates);
-            chartFragment = ChartFragment.newInstance(dates);
+            listFragment = ListStatistics.newInstance(transport, dates);
+            chartFragment = ChartFragment.newInstance(transport, dates);
             FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
             trans.replace(R.id.lfStatistics, listFragment, LISTFRAGMENT_TAG);
             trans.replace(R.id.chartContainer, chartFragment, CHARTFRAGMENT_TAG);
@@ -52,7 +61,7 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
             Mode m = (Mode)savedInstanceState.getSerializable("Mode");
             setMode(m);
             dates = (Date[])savedInstanceState.getSerializable("Dates");
-            transport = (HashMap<String, Boolean>)savedInstanceState.getSerializable("tMap");
+            transport = (ArrayList<TransportItem>)savedInstanceState.getSerializable("tArray");
             setShiftBtnEnabled();
             listFragment = (ListStatistics)getSupportFragmentManager().findFragmentByTag(LISTFRAGMENT_TAG);
             chartFragment = (ChartFragment)getSupportFragmentManager().findFragmentByTag(CHARTFRAGMENT_TAG);
@@ -65,13 +74,13 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
         outState.putSerializable("Mode", mode);
         outState.putSerializable("Dates", dates);
         outState.putSerializable("DatesRange", datesRange);
-        outState.putSerializable("tMap", transport);
+        outState.putSerializable("tArray", transport);
     }
 
     public void onChooseTransport(View view){
         DialogFragment dialog = new DialogTransport();
         Bundle args = new Bundle();
-        args.putSerializable("map", transport);
+        args.putSerializable("tArray", transport);
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager(), "dialogTransport");
     }
@@ -79,12 +88,9 @@ public class ActivityStatistics extends AppCompatActivity implements DialogTrans
 
     @Override
     public void onTransportListChange() {
-        ArrayList<String> t = new ArrayList<>();
-        for(String key: transport.keySet())
-            if(transport.get(key))
-                t.add(key);
-        listFragment.setTransport(new ArrayList<>(t));
-        chartFragment.setTransport(new ArrayList<>(t));
+
+        listFragment.setTransport(transport);
+        chartFragment.setTransport(transport);
     }
 
     public void onChangeMode(View view){

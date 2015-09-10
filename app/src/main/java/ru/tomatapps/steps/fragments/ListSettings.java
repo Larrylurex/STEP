@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.fragments;
 
 
 import android.database.Cursor;
@@ -12,6 +12,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import ru.tomatapps.steps.database.ContentResolverHelper;
+import ru.tomatapps.steps.dialogs.DialogDeleteItem;
+import ru.tomatapps.steps.dialogs.DialogEditItem;
+import ru.tomatapps.steps.dialogs.DialogItemExists;
+import ru.tomatapps.steps.adapters.MyCursorAdapter;
+import ru.tomatapps.steps.R;
+import ru.tomatapps.steps.database.StepsContract;
+import ru.tomatapps.steps.activities.ActivitySettings;
+import ru.tomatapps.steps.loaders.LoaderSettings;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,7 +29,7 @@ import android.widget.ListView;
 public class ListSettings extends Fragment implements MyCursorAdapter.CheckItemListener,
         DialogDeleteItem.DeleteItemDialogListener,
         DialogEditItem.EditItemDialogListener,
-        DialogItemExists.ItemExistDialogListener{
+        DialogItemExists.ItemExistDialogListener {
     private ContentResolverHelper helper;
     private MyCursorAdapter adapter;
     private LoaderSettings loader;

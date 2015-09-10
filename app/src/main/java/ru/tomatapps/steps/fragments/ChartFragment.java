@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.fragments;
 
 
 import android.database.Cursor;
@@ -25,6 +25,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import ru.tomatapps.steps.others.ColorGenerator;
+import ru.tomatapps.steps.R;
+import ru.tomatapps.steps.database.StepsContract;
+import ru.tomatapps.steps.others.TransportItem;
+import ru.tomatapps.steps.loaders.ChartLoader;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,11 +40,12 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
     private ChartLoader loader;
     private LineChart chart;
     private Date[] dates = new Date[2];
-    private ArrayList<String> transport;
+    private ArrayList<TransportItem> transport;
 
-    public static ChartFragment newInstance(Date[] dates) {
+    public static ChartFragment newInstance(ArrayList<TransportItem> transport, Date[] dates) {
         ChartFragment fragment = new ChartFragment();
         Bundle args = new Bundle();
+        args.putSerializable("tArray", transport);
         args.putSerializable("begin", dates[0]);
         args.putSerializable("end", dates[1]);
         fragment.setArguments(args);
@@ -50,6 +57,7 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         if (getArguments() != null) {
+            transport = (ArrayList<TransportItem>)getArguments().getSerializable("tArray");
             dates[0] = (Date)getArguments().getSerializable("begin");
             dates[1] = (Date)getArguments().getSerializable("end");
         }
@@ -70,14 +78,14 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
         return v;
     }
 
-    public void setTransport(ArrayList<String> transport){
+    public void setTransport(ArrayList<TransportItem> transport){
         this.transport = transport;
-        loader.setSelection(transport, dates);
+        loader.setSelection(TransportItem.getCheckedNames(transport), dates);
         getActivity().getSupportLoaderManager().getLoader(5).forceLoad();
     }
     public void setDates(Date[] dates){
         this.dates = dates;
-        loader.setSelection(transport, dates);
+        loader.setSelection(TransportItem.getCheckedNames(transport), dates);
         getActivity().getSupportLoaderManager().getLoader(5).forceLoad();
     }
 
@@ -126,6 +134,8 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
         }
         ArrayList<LineDataSet> sets = new ArrayList<>();
         Set<String> keys = map.keySet();
+        ColorGenerator colors = new ColorGenerator();
+
         for(String key: keys){
             ArrayList<Entry> entries = new ArrayList<>();
             int[] array = map.get(key);
@@ -134,6 +144,7 @@ public class ChartFragment extends Fragment implements LoaderManager.LoaderCallb
                 entries.add(e);
             }
             LineDataSet dataSet = new LineDataSet(entries, key);
+            dataSet.setColor(TransportItem.getTransportColor(transport, key));
             dataSet.setDrawCircles(false);
             sets.add(dataSet);
         }

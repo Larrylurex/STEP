@@ -9,7 +9,7 @@
         android:layout_gravity="left"
         android:id="@+id/tvMessage"/>
 
-    <view class="ru.tomatapps.steps.CurrencyEditText"
+    <view class="ru.tomatapps.steps.currency_views.CurrencyEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/etPrice"

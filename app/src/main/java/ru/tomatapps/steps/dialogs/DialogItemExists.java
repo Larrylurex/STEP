@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.dialogs;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import ru.tomatapps.steps.R;
 
 /**
  * Created by LarryLurex on 29.08.2015.

@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.database;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import static ru.tomatapps.steps.StepsContract.*;
 
 /**
  * Created by LarryLurex (dmitry.borodin90@gmail.com) on 07.09.2015.
@@ -23,26 +22,26 @@ public class StepsContentProvider extends ContentProvider {
     public boolean onCreate() {
         helper = new DbHelper(getContext());
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(AUTHORITY, SETTINGS_PATH, SETTINGS_CODE);
-        uriMatcher.addURI(AUTHORITY, SETTINGS_PATH_LIMIT, SETTINGS_LIMIT_CODE);
-        uriMatcher.addURI(AUTHORITY, STATISTICS_PATH, STATISTICS_CODE);
-        uriMatcher.addURI(AUTHORITY, STATISTICS_LIST_PATH, STATISTICS_LIST_CODE);
-        uriMatcher.addURI(AUTHORITY, STATISTICS_CHART_PATH, STATISTICS_CHART_CODE);
-        uriMatcher.addURI(AUTHORITY, STATISTICS_TRANSPORT_PATH, STATISTICS_TRANSPORT_CODE);
+        uriMatcher.addURI(StepsContract.AUTHORITY, StepsContract.SETTINGS_PATH, StepsContract.SETTINGS_CODE);
+        uriMatcher.addURI(StepsContract.AUTHORITY, StepsContract.SETTINGS_PATH_LIMIT, StepsContract.SETTINGS_LIMIT_CODE);
+        uriMatcher.addURI(StepsContract.AUTHORITY, StepsContract.STATISTICS_PATH, StepsContract.STATISTICS_CODE);
+        uriMatcher.addURI(StepsContract.AUTHORITY, StepsContract.STATISTICS_LIST_PATH, StepsContract.STATISTICS_LIST_CODE);
+        uriMatcher.addURI(StepsContract.AUTHORITY, StepsContract.STATISTICS_CHART_PATH, StepsContract.STATISTICS_CHART_CODE);
+        uriMatcher.addURI(StepsContract.AUTHORITY, StepsContract.STATISTICS_TRANSPORT_PATH, StepsContract.STATISTICS_TRANSPORT_CODE);
         return false;
     }
 
     @Override
     public String getType(Uri uri) {
         switch (uriMatcher.match(uri)){
-            case SETTINGS_CODE:
-            case SETTINGS_LIMIT_CODE:
-                return SETTINGS_CONTENT_TYPE;
-            case STATISTICS_CODE:
-            case STATISTICS_CHART_CODE:
-            case STATISTICS_LIST_CODE:
-            case STATISTICS_TRANSPORT_CODE:
-                return STATISTICS_CONTENT_TYPE;
+            case StepsContract.SETTINGS_CODE:
+            case StepsContract.SETTINGS_LIMIT_CODE:
+                return StepsContract.SETTINGS_CONTENT_TYPE;
+            case StepsContract.STATISTICS_CODE:
+            case StepsContract.STATISTICS_CHART_CODE:
+            case StepsContract.STATISTICS_LIST_CODE:
+            case StepsContract.STATISTICS_TRANSPORT_CODE:
+                return StepsContract.STATISTICS_CONTENT_TYPE;
         }
         return null;
     }
@@ -55,26 +54,26 @@ public class StepsContentProvider extends ContentProvider {
         String groupBy = null;
         String limit = null;
         switch (uriMatcher.match(uri)){
-            case SETTINGS_CODE:
-                table = T_SETTINGS;
+            case StepsContract.SETTINGS_CODE:
+                table = StepsContract.T_SETTINGS;
                 break;
-            case SETTINGS_LIMIT_CODE:
-                table = T_SETTINGS;
+            case StepsContract.SETTINGS_LIMIT_CODE:
+                table = StepsContract.T_SETTINGS;
                 limit = "1";
                 break;
-            case STATISTICS_CODE:
-                table = T_STATISTICS;
+            case StepsContract.STATISTICS_CODE:
+                table = StepsContract.T_STATISTICS;
                 break;
-            case STATISTICS_CHART_CODE:
-                table = T_STATISTICS;
-                groupBy = COL_TRANSPORT + " , " + COL_DATE;
+            case StepsContract.STATISTICS_CHART_CODE:
+                table = StepsContract.T_STATISTICS;
+                groupBy = StepsContract.COL_TRANSPORT + " , " + StepsContract.COL_DATE;
                 break;
-            case STATISTICS_LIST_CODE:
-                table = T_STATISTICS;
-                groupBy = COL_TRANSPORT;
+            case StepsContract.STATISTICS_LIST_CODE:
+                table = StepsContract.T_STATISTICS;
+                groupBy = StepsContract.COL_TRANSPORT;
                 break;
-            case STATISTICS_TRANSPORT_CODE:
-                table = T_STATISTICS;
+            case StepsContract.STATISTICS_TRANSPORT_CODE:
+                table = StepsContract.T_STATISTICS;
                 projection[0] = "DISTINCT " + projection[0];
                 break;
             default:
@@ -90,11 +89,11 @@ public class StepsContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         String table;
         switch (uriMatcher.match(uri)){
-            case SETTINGS_CODE:
-                table = T_SETTINGS;
+            case StepsContract.SETTINGS_CODE:
+                table = StepsContract.T_SETTINGS;
                 break;
-            case STATISTICS_CODE:
-                table = T_STATISTICS;
+            case StepsContract.STATISTICS_CODE:
+                table = StepsContract.T_STATISTICS;
                 break;
             default:
                 throw new IllegalArgumentException("Wrong URI: " + uri);
@@ -108,11 +107,11 @@ public class StepsContentProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         String table;
         switch (uriMatcher.match(uri)){
-            case SETTINGS_CODE:
-                table = T_SETTINGS;
+            case StepsContract.SETTINGS_CODE:
+                table = StepsContract.T_SETTINGS;
                 break;
-            case STATISTICS_CODE:
-                table = T_STATISTICS;
+            case StepsContract.STATISTICS_CODE:
+                table = StepsContract.T_STATISTICS;
                 break;
             default:
                 throw new IllegalArgumentException("Wrong URI: " + uri);
@@ -126,11 +125,11 @@ public class StepsContentProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         String table;
         switch (uriMatcher.match(uri)){
-            case SETTINGS_CODE:
-                table = T_SETTINGS;
+            case StepsContract.SETTINGS_CODE:
+                table = StepsContract.T_SETTINGS;
                 break;
-            case STATISTICS_CODE:
-                table = T_STATISTICS;
+            case StepsContract.STATISTICS_CODE:
+                table = StepsContract.T_STATISTICS;
                 break;
             default:
                 throw new IllegalArgumentException("Wrong URI: " + uri);
@@ -148,16 +147,16 @@ public class StepsContentProvider extends ContentProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + T_SETTINGS + " ( " +
-                    COL_ID + " integer primary key autoincrement, " +
-                    COL_TRANSPORT + " text," +
-                    COL_PRICE + " real, " +
-                    COL_DEFAULT + " integer );");
-            db.execSQL("CREATE TABLE " + T_STATISTICS + " ( " +
-                    COL_ID + " integer primary key autoincrement, " +
-                    COL_TRANSPORT + " text," +
-                    COL_PRICE + " real, " +
-                    COL_DATE + " integer NOT NULL DEFAULT (strftime('%s', 'now')));");
+            db.execSQL("CREATE TABLE " + StepsContract.T_SETTINGS + " ( " +
+                    StepsContract.COL_ID + " integer primary key autoincrement, " +
+                    StepsContract.COL_TRANSPORT + " text," +
+                    StepsContract.COL_PRICE + " real, " +
+                    StepsContract.COL_DEFAULT + " integer );");
+            db.execSQL("CREATE TABLE " + StepsContract.T_STATISTICS + " ( " +
+                    StepsContract.COL_ID + " integer primary key autoincrement, " +
+                    StepsContract.COL_TRANSPORT + " text," +
+                    StepsContract.COL_PRICE + " real, " +
+                    StepsContract.COL_DATE + " integer NOT NULL DEFAULT (strftime('%s', 'now')));");
         }
 
         @Override

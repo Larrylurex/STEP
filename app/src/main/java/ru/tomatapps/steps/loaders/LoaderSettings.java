@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.loaders;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.widget.ResourceCursorAdapter;
+
+import ru.tomatapps.steps.database.ContentResolverHelper;
 
 /**
  * Created by LarryLurex on 26.08.2015.
@@ -49,7 +50,6 @@ public class LoaderSettings implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        Log.d("myTag", "onFinished Callback " + this.hashCode() + " Loader " + cursorLoader.hashCode());
         adapter.swapCursor(cursor);
     }
 

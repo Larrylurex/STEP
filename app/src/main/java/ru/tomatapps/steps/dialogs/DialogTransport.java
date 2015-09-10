@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.dialogs;
 
 
 import android.app.Activity;
@@ -16,8 +16,10 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+
+import ru.tomatapps.steps.R;
+import ru.tomatapps.steps.others.TransportItem;
 
 
 /**
@@ -25,8 +27,18 @@ import java.util.Map;
  */
 public class DialogTransport extends DialogFragment {
 
-    private HashMap<String, Boolean> transport;
+    private ArrayList<TransportItem> transport;
     private OnTransportListListener mListener;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
+        if(bundle != null)
+            transport = (ArrayList<TransportItem>) bundle.getSerializable("tArray");
+
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,18 +48,18 @@ public class DialogTransport extends DialogFragment {
         ListView lv = (ListView)v.findViewById(R.id.lvTransport);
 
         String[] t = new String[]{};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, (transport.keySet()).toArray(t));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, (TransportItem.getNames(transport)).toArray(t));
         lv.setAdapter(adapter);
         lv.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
         int i = 0;
-        for(Map.Entry<String, Boolean> checked: transport.entrySet()){
-            lv.setItemChecked(i++, checked.getValue());
+        for(TransportItem item: transport){
+            lv.setItemChecked(i++, item.isChecked());
         }
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 CheckedTextView ctv = (CheckedTextView)view;
-                transport.put(ctv.getText().toString(), ctv.isChecked());
+                TransportItem.setTransportChecked(transport, ctv.getText().toString(), ctv.isChecked());
             }
         });
 
@@ -60,14 +72,7 @@ public class DialogTransport extends DialogFragment {
         mListener = (OnTransportListListener)activity;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Bundle bundle = getArguments();
-        if(bundle != null)
-            transport = (HashMap<String, Boolean>) bundle.getSerializable("map");
 
-    }
 
     @Override
     public void onDismiss(DialogInterface dialog) {

@@ -20,7 +20,7 @@
             android:layout_weight="1"
             android:textAllCaps="true"/>
 
-        <view class="ru.tomatapps.steps.CurrencyEditText"
+        <view class="ru.tomatapps.steps.currency_views.CurrencyEditText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/etPrice"

@@ -1,4 +1,4 @@
-package ru.tomatapps.steps;
+package ru.tomatapps.steps.loaders;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,6 +10,8 @@ import android.widget.SimpleCursorAdapter;
 
 import java.sql.Date;
 import java.util.ArrayList;
+
+import ru.tomatapps.steps.database.ContentResolverHelper;
 
 /**
  * Created by LarryLurex on 02.09.2015.
